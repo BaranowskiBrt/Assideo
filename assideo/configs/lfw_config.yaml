@@ -1,0 +1,28 @@
+model: 'tf_efficientnetv2_s_in21ft1k'
+pretrained: True
+embedding_length: 512
+train_image_dir: 'C:\Users\baran\Desktop\Project\poli\thesis\lfw'
+test_image_dir: 'C:\Users\baran\Desktop\Project\poli\thesis\lfw'
+batch_size: 4
+epochs: 30
+force_cpu: False
+stats_update_period: 1
+saved_model_path: '../assideo_files/weights.pt'
+save_type: 'weights' # weights or model
+mean: [0.485, 0.456, 0.406]
+std: [0.229, 0.224, 0.225]
+embeddings_path: '../assideo_files/embeddings.pt'
+train_csv: '../assideo_files/peopleDevTrain.csv'
+test_csv: '../assideo_files/peopleDevTest.csv'
+dropout_proba: 0.1
+criterion:
+  name: arcface
+  scaling: 45
+  margin: 0.1
+optimizer:
+  name: 'adam'
+  lr: 0.001
+scheduler: null
+wandb:
+  dir: ../assideo_files
+  project: image_retrieval
