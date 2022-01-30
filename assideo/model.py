@@ -32,10 +32,9 @@ class Backbone(nn.Module):
 
 
 class GeM(nn.Module):
-    def __init__(self, p=2, eps=1e-6):
+    def __init__(self, p=3, trainable=True, eps=1e-6):
         super().__init__()
-        self.p = nn.Parameter(torch.Tensor([p]))
-        # self.p = 2
+        self.p = nn.Parameter(torch.Tensor([p])) if trainable else p
         self.eps = eps
 
     def forward(self, x):
@@ -43,13 +42,13 @@ class GeM(nn.Module):
 
 
 class BaseModel(nn.Module):
-    def __init__(self, config, gem_pooling=True):
+    def __init__(self, config, gem_pooling=False):
         super().__init__()
         self.config = config
 
         self.backbone = Backbone(config.model)
-        self.pooling = GeM() if gem_pooling else partial(torch.mean,
-                                                         dim=(2, 3))
+        self.pooling = GeM() if config.get(gem_pooling, True) else partial(
+            torch.mean, dim=(2, 3))
 
         self.head = [
             nn.Linear(self.backbone.out_features,
@@ -75,6 +74,8 @@ class BaseModel(nn.Module):
 class TrainingModel(BaseModel):
     def __init__(self, config, cat_count):
         self.cat_count = cat_count
+        if config.criterion.name == 'subcenter_arcface' and 'subcenter_count' in config.criterion:
+            self.cat_count *= config.criterion.subcenter_count
         super().__init__(config=config)
 
     def create_head(self):

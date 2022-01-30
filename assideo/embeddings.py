@@ -5,6 +5,7 @@ import numpy as np
 import torch
 from torch.utils.data import DataLoader
 from torch.nn import CosineSimilarity
+from torchvision import transforms as T
 from tqdm import tqdm
 
 from .dataset import RetrievalDataset, collate_fn
@@ -28,13 +29,17 @@ class Embeddings:
             self.predictor = Predictor(self.cfg, model)
 
         self.cos_similarity = CosineSimilarity(dim=-1, eps=1e-8)
+        self.transforms = T.Compose([
+            T.ToTensor(),
+            T.Normalize(cfg.mean, cfg.std),
+        ])
 
         if embeddings:
             embedding_dict = embeddings
         elif not recreate and Path(cfg.get('embeddings_path', '')).is_file():
             embedding_dict = torch.load(cfg.embeddings_path)
         else:
-            dataset = dataset or RetrievalDataset(cfg)
+            dataset = dataset or RetrievalDataset(cfg, train=False)
             embedding_dict = self.create_embeddings(dataset)
 
         self.img_paths, self.embeddings = embedding_dict[
@@ -64,7 +69,7 @@ class Embeddings:
 
     def get_matches(self, image_path, top_matches=5):
         img = cv2.imread(image_path)
-        base_output = self.predictor(img)
+        base_output = self.predictor(self.transforms(img))
 
         matched = self.get_similar_embeddings(base_output).squeeze()
         sort, indices = matched.sort(descending=True)

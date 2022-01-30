@@ -9,6 +9,7 @@ force_cpu: False
 stats_update_period: 1
 saved_model_path: '../assideo_files/weights.pt'
 save_type: 'weights' # weights or model
+gem_pooling: False
 mean: [0.485, 0.456, 0.406]
 std: [0.229, 0.224, 0.225]
 embeddings_path: '../assideo_files/embeddings.pt'
@@ -20,7 +21,7 @@ criterion:
   scaling: 45
   margin: 0.1
 optimizer:
-  name: 'adam'
+  name: 'adamw'
   lr: 0.001
 scheduler: null
 wandb:

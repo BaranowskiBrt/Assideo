@@ -8,7 +8,7 @@ from tqdm import tqdm
 import wandb
 
 from .dataset import collate_fn
-from .loss import CosFaceLoss, ArcFaceLoss, CustomSoftmax
+from .loss import CosFaceLoss, ArcFaceLoss, CustomSoftmax, SubcenterArcFaceLoss
 
 
 class BaseTrainer:
@@ -107,6 +107,8 @@ class BaseTrainer:
             criterion_fn = ArcFaceLoss(**args)
         elif name == 'softmax':
             criterion_fn = CustomSoftmax(**args)
+        elif name == 'subcenter_arcface':
+            criterion_fn = SubcenterArcFaceLoss(**args)
         else:
             raise ValueError(f"Criterion '{name}' does not exist.")
         return criterion_fn

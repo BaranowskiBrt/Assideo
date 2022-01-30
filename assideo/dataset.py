@@ -15,7 +15,12 @@ def collate_fn(data):
 
 
 class RetrievalDataset(Dataset):
-    def __init__(self, cfg, train=True, extension='jpg', augmentations=None):
+    def __init__(self,
+                 cfg,
+                 train=True,
+                 extension='jpg',
+                 augmentations=None,
+                 transforms=None):
         self.extension = extension.strip('. ')
         self.img_dir = Path(
             cfg.train_image_dir if train else cfg.test_image_dir)
@@ -36,7 +41,7 @@ class RetrievalDataset(Dataset):
             categories.add(img_cat)
         self.cat_names = sorted(categories)
         self.augmentations = augmentations
-        self.transform = T.Compose([
+        self.transform = transforms or T.Compose([
             T.ToTensor(),
             T.Normalize(cfg.mean, cfg.std),
         ])
